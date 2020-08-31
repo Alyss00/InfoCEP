@@ -44,10 +44,6 @@ public class MainActivity extends AppCompatActivity {
         botaoRecuperar = findViewById(R.id.buttonRecuperar);
         textoResultado = findViewById(R.id.textResultado);
 
-
-
-
-
         botaoRecuperar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
