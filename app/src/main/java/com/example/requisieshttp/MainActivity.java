@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private Button botaoRecuperar;
     private TextView textoResultado;
     private EditText EditCEP;
+    private ProgressBar progressBar;
+
 
 
 
@@ -43,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
 
         botaoRecuperar = findViewById(R.id.buttonRecuperar);
         textoResultado = findViewById(R.id.textResultado);
+        progressBar = findViewById(R.id.progressBarCircular);
+        progressBar.setVisibility(View.GONE);
+
+
+
+
 
         botaoRecuperar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
                         String CEP = EditCEP.getText().toString();
                         String urlCEP = "https://viacep.com.br/ws/" + CEP + "/json/";
                         task.execute(urlCEP);
+                        textoResultado.setText(null);
+
                     }
             }
         });
@@ -65,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+
         }
 
         @Override
@@ -140,19 +154,25 @@ public class MainActivity extends AppCompatActivity {
                 });
                 alert.create();
                 alert.show();
+                progressBar.setVisibility(View.GONE);
+
 
 
             }else {
-                textoResultado.setText("Logadouro: " + logradouro + System.getProperty("line.separator")
-                        + "CEP: " + cep + System.getProperty("line.separator")
-                        + "Complemento: " + complemento + System.getProperty("line.separator")
-                        + "Bairro: " + bairro + System.getProperty("line.separator")
-                        + "Localidade: " + localidade + System.getProperty("line.separator")
-                        + "UF: " + uf + System.getProperty("line.separator")
-                        + "IBGE: " + ibge + System.getProperty("line.separator")
-                        + "GIA: " + gia + System.getProperty("line.separator")
+
+
+
+                textoResultado.setText("Logadouro: " + logradouro + "\n"
+                        + "CEP: " +  cep + "\n"
+                        + "Complemento: " + complemento + "\n"
+                        + "Bairro: " + bairro + "\n"
+                        + "Localidade: " + localidade + "\n"
+                        + "UF: " + uf + "\n"
+                        + "IBGE: " + ibge + "\n"
+                        + "GIA: " + gia + "\n"
                         + "DDD: " + ddd
                 );
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(getApplicationContext(), "Consulta Concluida", Toast.LENGTH_LONG).show();
             }
         }
