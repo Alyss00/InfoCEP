@@ -5,17 +5,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.inputmethodservice.Keyboard;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.GetChars;
+import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 
 import org.json.JSONException;
@@ -36,9 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText EditCEP;
     private ProgressBar progressBar;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,26 +56,42 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
         botaoRecuperar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
 
                     MyTask task = new MyTask();
+
                     EditCEP = findViewById(R.id.EditCEP);
                     if (EditCEP.length() < 8 ){
-                        Toast.makeText(getApplicationContext(),"Preencha o campo de texto!", Toast.LENGTH_SHORT).show();
+
+                        Toast.makeText(getApplicationContext(),"preencha com 8 dígitos", Toast.LENGTH_SHORT).show();
                     }else {
-                        String CEP = EditCEP.getText().toString();
-                        String urlCEP = "https://viacep.com.br/ws/" + CEP + "/json/";
-                        task.execute(urlCEP);
-                        textoResultado.setText(null);
+                        closeKeyboard();
+                        if (networkInfo != null && networkInfo.isConnected()) {
+                            String CEP = EditCEP.getText().toString();
+                            String urlCEP = "https://viacep.com.br/ws/" + CEP + "/json/";
+                            task.execute(urlCEP);
+                            textoResultado.setText(null);
+                        }else{
+                            Toast.makeText(getApplicationContext(),"Sem Conexão com a internet",Toast.LENGTH_LONG).show();
+                        }
 
                     }
             }
         });
+
+    }
+
+    private void closeKeyboard(){
+        View view = this.getCurrentFocus();
+        if (view != null){
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
     class MyTask extends AsyncTask<String, Void, String>{
         @Override
@@ -84,30 +104,34 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
 
-            String stringUrl = strings[0];
-            InputStream inputStream = null;
-            InputStreamReader inputStreamReader = null;
-            StringBuffer buffer = null;
-            try {
-                URL url = new URL(stringUrl);
-                HttpURLConnection conexao = (HttpURLConnection) url.openConnection();
-                inputStream = conexao.getInputStream();
-                inputStreamReader = new InputStreamReader(inputStream);
+                String stringUrl = strings[0];
+                InputStream inputStream = null;
+                InputStreamReader inputStreamReader = null;
+                StringBuffer buffer = null;
+                try {
+                    URL url = new URL(stringUrl);
+                    HttpURLConnection conexao = (HttpURLConnection) url.openConnection();
+                    inputStream = conexao.getInputStream();
+                    inputStreamReader = new InputStreamReader(inputStream);
 
-                BufferedReader reader = new BufferedReader(inputStreamReader);
-                buffer = new StringBuffer();
-                String linha;
+                    BufferedReader reader = new BufferedReader(inputStreamReader);
+                    buffer = new StringBuffer();
+                    String linha;
 
-                while ((linha = reader.readLine()) != null){
-                    buffer.append(linha);
+                    while ((linha = reader.readLine()) != null) {
+                        buffer.append(linha);
+                    }
+                } catch (MalformedURLException e) {
+
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                return buffer.toString();
+
             }
-            return buffer.toString();
-        }
+
 
         @SuppressLint("SetTextI18n")
         @Override
@@ -156,12 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 alert.show();
                 progressBar.setVisibility(View.GONE);
 
-
-
             }else {
-
-
-
                 textoResultado.setText("Logadouro: " + logradouro + "\n"
                         + "CEP: " +  cep + "\n"
                         + "Complemento: " + complemento + "\n"
