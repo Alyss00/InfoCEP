@@ -1,6 +1,6 @@
 package com.example.requisieshttp.api;
 
-import com.example.requisieshttp.CEP;
+import com.example.requisieshttp.model.CEP;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

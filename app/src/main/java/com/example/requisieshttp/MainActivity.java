@@ -1,44 +1,18 @@
 package com.example.requisieshttp;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Typeface;
-import android.inputmethodservice.Keyboard;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.GetChars;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.example.requisieshttp.api.CEPinteface;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
+import com.example.requisieshttp.model.CEP;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,10 +23,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     private Button botaoRecuperar;
-    private TextView textoResultado;
     public EditText EditCEP;
-    private ProgressBar progressBar;
     private Retrofit retrofit;
+    private TextView textCEP;
+    private TextView textLogradouro;
+    private TextView textBairro;
+    private TextView textLocalidade;
+    private TextView textComplemento;
+    private TextView textUF;
+    private TextView textIBGE;
+    private TextView textGIA;
+    private TextView textDDD;
+    private TextView textSIAFI;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +44,20 @@ public class MainActivity extends AppCompatActivity {
 
 
         botaoRecuperar = findViewById(R.id.buttonRecuperar);
-        textoResultado = findViewById(R.id.textResultado);
-        progressBar = findViewById(R.id.progressBarCircular);
         EditCEP = findViewById(R.id.EditCEP);
-        progressBar.setVisibility(View.GONE);
+
+        textCEP = findViewById(R.id.textCEP);
+        textLogradouro = findViewById(R.id.textLogradouro);
+        textComplemento = findViewById(R.id.textComplemento);
+        textLocalidade = findViewById(R.id.textLocalidade);
+        textBairro = findViewById(R.id.textBairro);
+        textUF = findViewById(R.id.textUF);
+        textIBGE = findViewById(R.id.textIBGE);
+        textGIA = findViewById(R.id.textGIA);
+        textDDD = findViewById(R.id.textDDD);
+        textSIAFI = findViewById(R.id.textSIAFI);
+
+
 
 
 
@@ -99,22 +92,28 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<CEP>() {
             @Override
             public void onResponse(Call<CEP> call, Response<CEP> response) {
-                if(response.isSuccessful()){
-                    textoResultado.setText(response.body().getBairro() + response.body().getCep());
-                }else {
-                    textoResultado.setText(response.message());
+                if (response.body().getErro() == "true") {
+                    Toast.makeText(getApplicationContext(), "Endereço CEP não encontrado", Toast.LENGTH_SHORT).show();
                 }
-
+                else if(response.isSuccessful()) {
+                    textCEP.setText("CEP: " + response.body().getCep());
+                    textLogradouro.setText("Logradouro: " + response.body().getLogradouro());
+                    textComplemento.setText("Complemento: " + response.body().getComplemento());
+                    textBairro.setText("Bairro: " + response.body().getBairro());
+                    textLocalidade.setText("Localidade: " + response.body().getLocalidade());
+                    textUF.setText("UF: " + response.body().getUf());
+                    textIBGE.setText("IBGE: " + response.body().getIbge());
+                    textGIA.setText("GIA: " + response.body().getGia());
+                    textDDD.setText("DDD: " + response.body().getDdd());
+                    textSIAFI.setText("SIAFI: " + response.body().getSiafi());
+                }else {
+                    Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG).show();
+                }
             }
-
             @Override
             public void onFailure(Call<CEP> call, Throwable t) {
-                textoResultado.setText(t.getMessage());
-
+                Toast.makeText(getApplicationContext(), "OnFailure" + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
-
-
-
 }

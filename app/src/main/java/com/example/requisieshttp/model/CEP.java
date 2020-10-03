@@ -1,9 +1,13 @@
-package com.example.requisieshttp;
+package com.example.requisieshttp.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class CEP {
+    @SerializedName("erro")
+    @Expose
+    private String erro;
+
     @SerializedName("cep")
     @Expose
     private String cep;
@@ -34,6 +38,14 @@ public class CEP {
     @SerializedName("siafi")
     @Expose
     private String siafi;
+
+    public String getErro() {
+        return erro;
+    }
+
+    public void setErro(String erro) {
+        this.erro = erro;
+    }
 
     public String getCep() {
         return cep;
