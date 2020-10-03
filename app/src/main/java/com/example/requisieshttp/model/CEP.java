@@ -7,7 +7,6 @@ public class CEP {
     @SerializedName("erro")
     @Expose
     private String erro;
-
     @SerializedName("cep")
     @Expose
     private String cep;
@@ -64,6 +63,10 @@ public class CEP {
     }
 
     public String getComplemento() {
+        String info = "Sem informação ";
+        if (complemento.equals("")){
+            return info;
+        }else
         return complemento;
     }
 
@@ -104,6 +107,10 @@ public class CEP {
     }
 
     public String getGia() {
+        String info= "GIA somente em SP";
+        if(gia.equals("")){
+            return  info;
+        }else
         return gia;
     }
 

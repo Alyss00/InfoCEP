@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         botaoRecuperar = findViewById(R.id.buttonRecuperar);
         EditCEP = findViewById(R.id.EditCEP);
 
@@ -57,14 +56,6 @@ public class MainActivity extends AppCompatActivity {
         textDDD = findViewById(R.id.textDDD);
         textSIAFI = findViewById(R.id.textSIAFI);
 
-
-
-
-
-
-
-
-
         botaoRecuperar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,11 +67,6 @@ public class MainActivity extends AppCompatActivity {
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
                 RetornarCEP();
-
-
-
-
-
             }
         });
     }
