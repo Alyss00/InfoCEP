@@ -1,5 +1,9 @@
 package com.example.requisieshttp.model;
 
+import android.graphics.Typeface;
+import android.view.View;
+import android.widget.TextView;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -63,7 +67,7 @@ public class CEP {
     }
 
     public String getComplemento() {
-        String info = "Sem informação ";
+        String info = "Sem informação" ;
         if (complemento.equals("")){
             return info;
         }else

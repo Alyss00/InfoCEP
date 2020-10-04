@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textGIA;
     private TextView textDDD;
     private TextView textSIAFI;
-
+    private ProgressBar ProgressBarCircular;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
         botaoRecuperar = findViewById(R.id.buttonRecuperar);
         EditCEP = findViewById(R.id.EditCEP);
-
         textCEP = findViewById(R.id.textCEP);
         textLogradouro = findViewById(R.id.textLogradouro);
         textComplemento = findViewById(R.id.textComplemento);
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         textGIA = findViewById(R.id.textGIA);
         textDDD = findViewById(R.id.textDDD);
         textSIAFI = findViewById(R.id.textSIAFI);
+        ProgressBarCircular = findViewById(R.id.progressBarCircular);
 
         botaoRecuperar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,11 +63,17 @@ public class MainActivity extends AppCompatActivity {
 
                 String editCEP = EditCEP.getText().toString();
 
-                retrofit = new Retrofit.Builder()
-                        .baseUrl("https://viacep.com.br/ws/" +editCEP +"/")
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
-                RetornarCEP();
+                if(EditCEP.length() < 8) {
+                    Toast.makeText(getApplicationContext(),"O endereço CEP precisa ter 8 Digítos",Toast.LENGTH_SHORT).show();
+                }else{
+                    retrofit = new Retrofit.Builder()
+                            .baseUrl("https://viacep.com.br/ws/" + editCEP + "/")
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+                    RetornarCEP();
+
+                }
+
             }
         });
     }
@@ -74,11 +81,15 @@ public class MainActivity extends AppCompatActivity {
     public void RetornarCEP(){
         CEPinteface cepinteface = retrofit.create(CEPinteface.class);
         Call<CEP> call = cepinteface.getCEP();
+        ProgressBarCircular.setVisibility(View.VISIBLE);
 
         call.enqueue(new Callback<CEP>() {
             @Override
             public void onResponse(Call<CEP> call, Response<CEP> response) {
+
                 if (response.body().getErro() == "true") {
+
+                    ProgressBarCircular.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(), "Endereço CEP não encontrado", Toast.LENGTH_SHORT).show();
                 }
                 else if(response.isSuccessful()) {
@@ -92,12 +103,15 @@ public class MainActivity extends AppCompatActivity {
                     textGIA.setText("GIA: " + response.body().getGia());
                     textDDD.setText("DDD: " + response.body().getDdd());
                     textSIAFI.setText("SIAFI: " + response.body().getSiafi());
+                    ProgressBarCircular.setVisibility(View.GONE);
                 }else {
                     Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG).show();
+                    ProgressBarCircular.setVisibility(View.GONE);
                 }
             }
             @Override
             public void onFailure(Call<CEP> call, Throwable t) {
+                ProgressBarCircular.setVisibility(View.GONE);
                 Toast.makeText(getApplicationContext(), "OnFailure" + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
