@@ -1,13 +1,16 @@
 package com.example.requisieshttp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +23,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import static android.view.View.VISIBLE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView textDDD;
     private TextView textSIAFI;
     private ProgressBar ProgressBarCircular;
+    private Switch switchMode;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +64,19 @@ public class MainActivity extends AppCompatActivity {
         textDDD = findViewById(R.id.textDDD);
         textSIAFI = findViewById(R.id.textSIAFI);
         ProgressBarCircular = findViewById(R.id.progressBarCircular);
+        switchMode = findViewById(R.id.switch1);
+
+        switchMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                }else{
+                    getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                }
+            }
+        });
+
 
         botaoRecuperar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,10 +91,9 @@ public class MainActivity extends AppCompatActivity {
                             .baseUrl("https://viacep.com.br/ws/" + editCEP + "/")
                             .addConverterFactory(GsonConverterFactory.create())
                             .build();
+                    limparTextview();
                     RetornarCEP();
-
                 }
-
             }
         });
     }
@@ -81,14 +101,14 @@ public class MainActivity extends AppCompatActivity {
     public void RetornarCEP(){
         CEPinteface cepinteface = retrofit.create(CEPinteface.class);
         Call<CEP> call = cepinteface.getCEP();
-        ProgressBarCircular.setVisibility(View.VISIBLE);
+        ProgressBarCircular.setVisibility(VISIBLE);
+
 
         call.enqueue(new Callback<CEP>() {
             @Override
             public void onResponse(Call<CEP> call, Response<CEP> response) {
 
                 if (response.body().getErro() == "true") {
-
                     ProgressBarCircular.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(), "Endereço CEP não encontrado", Toast.LENGTH_SHORT).show();
                 }
@@ -116,4 +136,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    public void limparTextview(){
+        textCEP.setText(null);
+        textLogradouro.setText(null);
+        textComplemento.setText(null);
+        textBairro.setText(null);
+        textLocalidade.setText(null);
+        textUF.setText(null);
+        textIBGE.setText(null);
+        textGIA.setText(null);
+        textDDD.setText(null);
+        textSIAFI.setText(null);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
