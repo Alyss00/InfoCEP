@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +30,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static android.view.View.VISIBLE;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String MYPREFERENCES = "nightModePrefs";
+    public static final String KEY_ISNIGHTMODE = "isNightMode";
 
     private Button botaoRecuperar;
     public EditText EditCEP;
@@ -43,11 +48,12 @@ public class MainActivity extends AppCompatActivity {
     private TextView textSIAFI;
     private ProgressBar ProgressBarCircular;
     private Switch switchMode;
-
+    SharedPreferences sharedPreferences;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -65,18 +71,22 @@ public class MainActivity extends AppCompatActivity {
         textSIAFI = findViewById(R.id.textSIAFI);
         ProgressBarCircular = findViewById(R.id.progressBarCircular);
         switchMode = findViewById(R.id.switch1);
-
-        switchMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+        sharedPreferences = getSharedPreferences(MYPREFERENCES, Context.MODE_PRIVATE);
+        checkNightMode();
+        switchMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                }else{
-                    getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                }
+               if (isChecked){
+                   AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                   saveNightModeState(true);
+                   recreate();
+               }else{
+                   AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                   saveNightModeState(false);
+                   recreate();
+               }
             }
         });
-
 
         botaoRecuperar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,12 +108,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void saveNightModeState(boolean nightMode) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(KEY_ISNIGHTMODE, nightMode);
+        editor.apply();
+    }
+
+    public void checkNightMode(){
+        if(sharedPreferences.getBoolean(KEY_ISNIGHTMODE, false)){
+            switchMode.setChecked(true);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }else{
+            switchMode.setChecked(false);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
+
     public void RetornarCEP(){
         CEPinteface cepinteface = retrofit.create(CEPinteface.class);
         Call<CEP> call = cepinteface.getCEP();
         ProgressBarCircular.setVisibility(VISIBLE);
-
-
         call.enqueue(new Callback<CEP>() {
             @Override
             public void onResponse(Call<CEP> call, Response<CEP> response) {
