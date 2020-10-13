@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -20,6 +21,8 @@ import android.widget.Toast;
 
 import com.example.requisieshttp.api.CEPinteface;
 import com.example.requisieshttp.model.CEP;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView textSIAFI;
     private ProgressBar ProgressBarCircular;
     private Switch switchMode;
+    private FloatingActionButton fab;
     SharedPreferences sharedPreferences;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         textSIAFI = findViewById(R.id.textSIAFI);
         ProgressBarCircular = findViewById(R.id.progressBarCircular);
         switchMode = findViewById(R.id.switch1);
+        fab = findViewById(R.id.FABsave);
         sharedPreferences = getSharedPreferences(MYPREFERENCES, Context.MODE_PRIVATE);
         checkNightMode();
         switchMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -87,6 +91,19 @@ public class MainActivity extends AppCompatActivity {
                }
             }
         });
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar.make(v,"Ação ao clicar no botão", Snackbar.LENGTH_LONG).setAction("texto", null);
+                Intent Activity =  new Intent(MainActivity.this, SaveActivity.class);
+                startActivity(Activity);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+            }
+        });
+
+
+
 
         botaoRecuperar.setOnClickListener(new View.OnClickListener() {
             @Override
